@@ -7,6 +7,7 @@ import re  # regular expressions module needed to validate the input fields
 def get_full_name():
     while True:
         # Prompt the user to enter their full name
+        # .strip() method - clears white space before and after input
         full_name = input("Please enter the name: ").strip()
 
         # Check if the name is empty

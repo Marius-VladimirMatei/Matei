@@ -1,13 +1,6 @@
 # Personal Data Collect System in Python
 
 
-"""
-class Person:
-    def __init__(self,full_name, address):
-        self.full_name = full_name
-        self.address = address
-"""
-
 
 # regular expressions module needed to validate the input fields
 import re
