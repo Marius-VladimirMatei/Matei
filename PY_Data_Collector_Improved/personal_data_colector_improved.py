@@ -1,6 +1,6 @@
 import re  # regular expressions module needed to validate the input fields
 
-#PY_Data_Collector_Improved
+#PY_Data_Collector_Improved: clear data and string type output
 
 
 # ------------------------------- Data Clean function --------------------------------
