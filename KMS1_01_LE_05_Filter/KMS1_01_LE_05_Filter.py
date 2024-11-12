@@ -1,6 +1,7 @@
 import re  # regular expressions module needed to validate the input fields
 
 #PY_Data_Collector_Improved: clear data and string type output
+#KMS1_01_LE_05 - Filter by name added function
 
 
 # ------------------------------- Data Clean function --------------------------------
@@ -192,6 +193,24 @@ def show_all_employees(employees):
             print("-------------------------------------------------------")
 
 
+
+# -------------------------------Filter FUnctions ---------------------------
+
+def filter_by_name(records, entity_type="Visitor"):
+    search_term = input(f"Enter the name or part of the name of the {entity_type} to filter by: ").strip().lower()
+    filtered_records = [record for record in records if search_term in record.lower()]
+    return filtered_records
+
+def show_filtered_records(filtered_records, entity_type="Visitor"):
+    if not filtered_records:
+        print(f"No {entity_type}s found with the given filter.")
+    else:
+        print(f"------------- Filtered {entity_type}s ---------------")
+        for record in filtered_records:
+            print(record)
+            print("-------------------------------------------------------")
+
+
 # ------------------------------- Main Program ------------------------------
 
 def main():
@@ -201,19 +220,18 @@ def main():
     employees = []
 
     while True:
-        # Menu for adding new entry
         print("-------------------------------------------------------")
         print("1. Add new")
         print("2. Show all")
-        print("3. Exit")
+        print("3. Filter")
+        print("4. Exit")
 
-        choice = input("Please select an option (1-3): ").strip()
+        choice = input("Please select an option (1-4): ").strip()
 
         if choice == '1':
             print("1. Add new Visitor")
             print("2. Add new Employee")
             sub_choice = input("Please select Visitor or Employee to add (1-2): ").strip()
-
             if sub_choice == '1':
                 add_new_visitor(visitors)
             elif sub_choice == '2':
@@ -225,7 +243,6 @@ def main():
             print("1. Show all Visitors")
             print("2. Show all Employees")
             sub_choice = input("Please select Visitors or Employees to display (1-2): ").strip()
-
             if sub_choice == '1':
                 show_all_visitors(visitors)
             elif sub_choice == '2':
@@ -234,10 +251,24 @@ def main():
                 print("Invalid choice. Please choose either 1 or 2.")
 
         elif choice == '3':
+            print("1. Filter Visitors")
+            print("2. Filter Employees")
+            sub_choice = input("Please select Visitors or Employees to filter (1-2): ").strip()
+            if sub_choice == '1':
+                filtered_visitors = filter_by_name(visitors, "Visitor")
+                show_filtered_records(filtered_visitors, "Visitor")
+            elif sub_choice == '2':
+                filtered_employees = filter_by_name(employees, "Employee")
+                show_filtered_records(filtered_employees, "Employee")
+            else:
+                print("Invalid choice. Please choose either 1 or 2.")
+
+        elif choice == '4':
             print("Exiting the program.")
             break
+
         else:
-            print("Invalid choice. Please select an option (1-3):")
+            print("Invalid choice. Please select an option (1-4):")
 
 
 main()
