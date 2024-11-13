@@ -201,31 +201,50 @@ def main():
     employees = []
 
     while True:
-        # Display the Menu
+        # Display the simplified Menu
         print("-------------------------------------------------------")
         print("Welcome to the Personal Data Collection Program!")
-        print("1. Add new Visitor")
-        print("2. Add new Employee")
-        print("3. Show all Visitors")
-        print("4. Show all Employees")
-        print("5. Exit")
+        print("1. Add new")
+        print("2. Show all")
+        print("3. Exit")
 
-        choice = input("Please select an option (1-5): ").strip()
+        choice = input("Please select an option (1-3): ").strip()
 
         if choice == '1':
-            add_new_visitor(visitors)
+            print("1. Add new Visitor")
+            print("2. Add new Employee")
+
+            sub_choice = input("Please select Visitor or Employee to add (1-2): ").strip()
+
+            if sub_choice == '1':
+                add_new_visitor(visitors)
+            elif sub_choice == '2':
+                add_new_employee(employees)
+            else:
+                print("Invalid choice. Please choose either 1 or 2.")
+
+
         elif choice == '2':
-            add_new_employee(employees)
+            print("1. Show all Visitors")
+            print("2. Show all Employees")
+
+            sub_choice = input("Please select Visitors or Employees to display (1-2): ").strip()
+
+            if sub_choice == '1':
+                show_all_visitors(visitors)
+
+            elif sub_choice == '2':
+                show_all_employees(employees)
+            else:
+                print("Invalid choice. Please choose either 1 or 2.")
+
         elif choice == '3':
-            show_all_visitors(visitors)
-        elif choice == '4':
-            show_all_employees(employees)
-        elif choice == '5':
             print("Exiting the program.")
             break
+
         else:
             print("-------------------------------------------------------")
-            print("Invalid choice. Please select an option (1-5):")
+            print("Invalid choice. Please select an option (1-3):")
 
-
+# Run the main function
 main()
