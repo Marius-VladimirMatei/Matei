@@ -112,7 +112,7 @@ def get_date_of_birth():
 
         # Regular expression to match a valid date format (DD/MM/YYYY)
         # Allows: two digits for day, two digits for month, four digits for year
-        if not re.match(r"^\d{2}/\d{2}/\d{4}$", date_of_birth):
+        if not re.match(r"^(0?[1-9]|[12][0-9]|3[01])[\/\-](0?[1-9]|1[012])[\/\-]\d{4}$", date_of_birth):
             print("Error: The date of birth must be in the format DD/MM/YYYY. Please enter a valid date.")
         else:
             print(f"Thank you! The date of birth '{date_of_birth}' has been successfully captured.")
@@ -194,22 +194,39 @@ def show_all_employees(employees):
 
 
 
-# -------------------------------Filter FUnctions ---------------------------
+# ----------------------------- Search Function ------------------------------
 
-def filter_by_name(records, entity_type="Visitor"):
-    search_term = input(f"Enter the name or part of the name of the {entity_type} to filter by: ").strip().lower()
-    filtered_records = [record for record in records if search_term in record.lower()]
-    return filtered_records
+def search_visitors(visitors):
+    if not visitors:
+        print("No visitors to search.")
+        return
+    search_term = input("Enter search term for visitors (Name, Email, or Telephone): ").strip().lower()
+    found_visitors = [visitor for visitor in visitors if search_term in visitor.lower()]
 
-def show_filtered_records(filtered_records, entity_type="Visitor"):
-    if not filtered_records:
-        print(f"No {entity_type}s found with the given filter.")
-    else:
-        print(f"------------- Filtered {entity_type}s ---------------")
-        for record in filtered_records:
-            print(record)
+    if found_visitors:
+        print("Search Results for Visitors:")
+        for visitor in found_visitors:
+            print(visitor)
             print("-------------------------------------------------------")
+    else:
+        print("No matching visitors found.")
 
+
+def search_employees(employees):
+    if not employees:
+        print("No employees to search.")
+        return
+    search_term = input("Enter search term for employees (Name, Email, Employee ID): ").strip().lower()
+    found_employees = [employee for employee in employees if search_term in employee.lower()]
+
+
+    if found_employees:
+        print("Search Results for Employees:")
+        for employee in found_employees:
+            print(employee)
+            print("-------------------------------------------------------")
+    else:
+        print("No matching employees found.")
 
 # ------------------------------- Main Program ------------------------------
 
@@ -221,9 +238,10 @@ def main():
 
     while True:
         print("-------------------------------------------------------")
+        print("Welcome to the Personal Data Collection Program!")
         print("1. Add new")
         print("2. Show all")
-        print("3. Filter")
+        print("3. Search")
         print("4. Exit")
 
         choice = input("Please select an option (1-4): ").strip()
@@ -243,6 +261,7 @@ def main():
             print("1. Show all Visitors")
             print("2. Show all Employees")
             sub_choice = input("Please select Visitors or Employees to display (1-2): ").strip()
+
             if sub_choice == '1':
                 show_all_visitors(visitors)
             elif sub_choice == '2':
@@ -251,15 +270,14 @@ def main():
                 print("Invalid choice. Please choose either 1 or 2.")
 
         elif choice == '3':
-            print("1. Filter Visitors")
-            print("2. Filter Employees")
-            sub_choice = input("Please select Visitors or Employees to filter (1-2): ").strip()
+            print("1. Search Visitors")
+            print("2. Search Employees")
+            sub_choice = input("Please select Visitors or Employees to search (1-2): ").strip()
+
             if sub_choice == '1':
-                filtered_visitors = filter_by_name(visitors, "Visitor")
-                show_filtered_records(filtered_visitors, "Visitor")
+                search_visitors(visitors)
             elif sub_choice == '2':
-                filtered_employees = filter_by_name(employees, "Employee")
-                show_filtered_records(filtered_employees, "Employee")
+                search_employees(employees)
             else:
                 print("Invalid choice. Please choose either 1 or 2.")
 
@@ -268,6 +286,7 @@ def main():
             break
 
         else:
+            print("-------------------------------------------------------")
             print("Invalid choice. Please select an option (1-4):")
 
 

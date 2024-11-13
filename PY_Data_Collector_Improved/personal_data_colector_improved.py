@@ -1,6 +1,7 @@
 import re  # regular expressions module needed to validate the input fields
 
 #PY_Data_Collector_Improved: clear data and string type output
+# New subtracted menu
 
 
 # ------------------------------- Data Clean function --------------------------------
@@ -93,7 +94,7 @@ def get_telephone_number():
         # Clean and validate telephone number, remove extra spaces
         telephone_number = re.sub(r"\s+", "", telephone_number)
 
-        if not re.match(r"^[0-9\s'-]+$", telephone_number):
+        if not re.match(r"^[0-9\s'-`]+$", telephone_number):
             print("Error: The telephone number cannot be empty. Please enter a valid telephone number.")
         else:
             print(f"Thank you! The telephone number '{telephone_number}' has been successfully captured.")
@@ -111,7 +112,8 @@ def get_date_of_birth():
 
         # Regular expression to match a valid date format (DD/MM/YYYY)
         # Allows: two digits for day, two digits for month, four digits for year
-        if not re.match(r"^\d{2}/\d{2}/\d{4}$", date_of_birth):
+        # ^\d{2}/\d{2}/\d{4}$ old pattern
+        if not re.match(r"^(0?[1-9]|[12][0-9]|3[01])[\/\-](0?[1-9]|1[012])[\/\-]\d{4}$", date_of_birth):
             print("Error: The date of birth must be in the format DD/MM/YYYY. Please enter a valid date.")
         else:
             print(f"Thank you! The date of birth '{date_of_birth}' has been successfully captured.")
