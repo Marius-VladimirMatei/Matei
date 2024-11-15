@@ -2,8 +2,8 @@ import re  # regular expressions module needed to validate the input fields
 
 
 
-# updated show all functions with indexing each entry
-# update entry functions
+# updated show all functions with indexing each entry for better handling
+# new implementation - update entry functions
 
 
 
@@ -15,20 +15,35 @@ def clean_data(data):
 
 
 # ------------------------------- Data collection functions --------------------------------
+
+# Function to collect and validate the full name
 def get_full_name():
     while True:
+        # Prompt the user to enter their full name
+        # .strip() method - clears white space before and after input
         full_name = input("Please enter the name: ").strip()
+
+        # Check if the name is empty
         if not full_name:
             print("Error: The name cannot be empty. Please enter the name.")
             continue
+
+        # Clean and validate the name field
         full_name = clean_data(full_name)
+
+        # Regular expression to match valid characters (letters, spaces, apostrophes, hyphens)
+        # raw string used to treat characters just like normal ones and not like special \n \t
+        # \s whitespace | + more of the same character  | ^ start of the string |  $ the end of the string
         if not re.match(r"^[A-Za-zäöüÄÖÜß\s'-]+$", full_name):
             print("Error: The name can only contain letters, spaces, apostrophes, or hyphens. Please enter a valid name.")
+
         else:
+            # If valid input, return the full name and provide feed-back
             print(f"Thank you! The name '{full_name}' has been successfully captured.")
             return full_name
 
 
+# Function to collect and validate the address
 def get_address():
     while True:
         address = input("Please enter the address: ").strip()
@@ -43,6 +58,7 @@ def get_address():
             return address
 
 
+# Function to collect and validate the email
 def get_email():
     while True:
         email = input("Please enter the email: ").strip()
@@ -58,6 +74,7 @@ def get_email():
             return email
 
 
+# Function to collect and validate the telephone number
 def get_telephone_number():
     while True:
         telephone_number = input("Please enter the telephone number: ").strip()
@@ -66,19 +83,22 @@ def get_telephone_number():
             continue
         telephone_number = clean_data(telephone_number)
         telephone_number = re.sub(r"\s+", "", telephone_number)
-        if not re.match(r"^[0-9\s'-`]+$", telephone_number):
+        if not re.match(r"^[0-9\s'+-`]+$", telephone_number):
             print("Error: The telephone number cannot be empty. Please enter a valid telephone number.")
         else:
             print(f"Thank you! The telephone number '{telephone_number}' has been successfully captured.")
             return telephone_number
 
 
+# Function to collect and validate the date of birth
 def get_date_of_birth():
     while True:
         date_of_birth = input("Please enter the date of birth (DD/MM/YYYY): ").strip()
         if not date_of_birth:
             print("Error: The date of birth cannot be empty. Please enter a valid date of birth.")
             continue
+
+        # 0? - 0 is optional (01/12 or 1/12) | 0?[1-9] - single digit | [12][0-9] - 2 digits  from 10 to 29 | 3[01] - 30 and 31
         if not re.match(r"^(0?[1-9]|[12][0-9]|3[01])[\/\-](0?[1-9]|1[012])[\/\-]\d{4}$", date_of_birth):
             print("Error: The date of birth must be in the format DD/MM/YYYY. Please enter a valid date.")
         else:
@@ -86,6 +106,7 @@ def get_date_of_birth():
             return date_of_birth
 
 
+# Function to collect and validate the employee ID
 def get_employee_id():
     while True:
         employee_id = input("Please enter the Employee ID: ").strip()
@@ -100,6 +121,8 @@ def get_employee_id():
 
 
 # ------------------------ Add new Visitor / Employee functions --------------------
+
+# Function to add a new visitor
 def add_new_visitor(visitors):
     print("Start adding a new Visitor")
     full_name = get_full_name()
@@ -112,6 +135,7 @@ def add_new_visitor(visitors):
     print("New Visitor successfully added!")
 
 
+# Function to add a new employee
 def add_new_employee(employees):
     print("Start adding a new Employee")
     full_name = get_full_name()
@@ -126,6 +150,8 @@ def add_new_employee(employees):
 
 
 # ----------------------------- Show All Functions ------------------------------
+
+# Function to display all Visitors
 def show_all_visitors(visitors):
     if not visitors:
         print("No Visitors have been added yet.")
@@ -136,6 +162,7 @@ def show_all_visitors(visitors):
             print("-------------------------------------------------------")
 
 
+# Function to display all Employees
 def show_all_employees(employees):
     if not employees:
         print("No employees have been added yet.")
@@ -149,6 +176,7 @@ def show_all_employees(employees):
 
 # ----------------------------- Search Function ------------------------------
 
+# Function to search in Visitors list
 def search_visitors(visitors):
     if not visitors:
         print("No visitors to search.")
@@ -168,6 +196,7 @@ def search_visitors(visitors):
         return []  # Return an empty list if no results
 
 
+# Function to search in Employees list
 def search_employees(employees):
     if not employees:
         print("No employees to search.")
@@ -189,18 +218,29 @@ def search_employees(employees):
 
 # ----------------------------- Update Functions ------------------------------
 
+# Function to update/change an entry in Visitors list
+
 def update_visitor(visitors):
-    matching_visitors = search_visitors(visitors)  # Get matching visitors
+    # 1. Start by calling the search function
+    # new variable to hold found values
+    matching_visitors = search_visitors(visitors)
+
     if not matching_visitors:
-        return  # Exit if no matching visitors
+        # Exit if no matching visitors
+        return
+
+    # try/except - exception handling(invalid input) - catch the runtime errors without the app to crush
+    # 2. After search mathing_visitors found => prompt the user for index number of person he wants to update/change value
 
     try:
+        # -1 => the pyton list is 0-indexed, always subtract 1 to get the correct index value
         visitor_index = int(input("Enter the number of the visitor you want to update: ")) - 1
         if 0 <= visitor_index < len(matching_visitors):
             visitor = matching_visitors[visitor_index]
             visitor_details = visitor.split(", ")
             print(f"Current details of the selected visitor:\n{visitor}")
 
+            # Prompt user for filed to be updated
             print("Select the field to update:")
             print("1. Name")
             print("2. Address")
@@ -209,6 +249,7 @@ def update_visitor(visitors):
             print("5. Date of Birth")
             field_choice = input("Enter the number of the field to update: ")
 
+            #new_ variable to hold the new input data from user
             if field_choice == '1':
                 new_name = get_full_name()
                 visitor_details[0] = f"Name: {new_name}"
@@ -228,9 +269,10 @@ def update_visitor(visitors):
                 print("Invalid choice. No updates made.")
                 return
 
-            # Update the visitor record in the full list
-            visitor_str = ", ".join(visitor_details)
-            visitors[visitors.index(matching_visitors[visitor_index])] = visitor_str
+            # Update the modified visitor record in the full list
+            # visitor_new_value - new variable to store all updates for the modified/changed visitor
+            visitor_new_value = ", ".join(visitor_details)
+            visitors[visitors.index(matching_visitors[visitor_index])] = visitor_new_value
             print("Visitor details updated successfully!")
         else:
             print("Invalid choice. No updates made.")
@@ -238,6 +280,7 @@ def update_visitor(visitors):
         print("Invalid input. Please enter a valid number.")
 
 
+# Function to update/change an entry in Employees list
 def update_employee(employees):
     matching_employees = search_employees(employees)  # Get matching employees
     if not matching_employees:
