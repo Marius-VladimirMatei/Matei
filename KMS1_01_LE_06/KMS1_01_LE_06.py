@@ -7,7 +7,7 @@ def clean_data(data):
     data = re.sub(r'\s+', ' ', data)  # Replace multiple spaces with a single space
     return ' '.join(word.capitalize() for word in data.split())  # Capitalize each word
 
-# ------------------------------- File I/O Functions --------------------------------
+# ------------------------------- File Save / Load Functions --------------------------------
 
 # Function to load visitors and employees from a file
 def load_data(filename):
@@ -22,14 +22,6 @@ def save_data(filename, data):
     with open(filename, 'w') as file:
         for entry in data:
             file.write(entry + '\n')
-
-
-# ------------------------------- Data Clean function --------------------------------
-def clean_data(data):
-    data = data.strip()
-    data = re.sub(r'\s+', ' ', data)  # Replace multiple spaces with a single space
-    return ' '.join(word.capitalize() for word in data.split())  # Capitalize each word
-
 
 # ------------------------------- Data collection functions --------------------------------
 
