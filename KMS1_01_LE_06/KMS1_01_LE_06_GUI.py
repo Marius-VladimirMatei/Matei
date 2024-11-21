@@ -1,29 +1,9 @@
-from tkinter import *
-from tkinter import messagebox
+import tkinter as tk
+from tkinter import ttk, messagebox, simpledialog
 import re
 import os
 
-# Create root window
-root = Tk()
-
-# Root window title and dimension
-root.title("Data Collector")
-
-# Set geometry (width x height)
-root.geometry('700x500')
-
-# Set the dark theme colors
-root.configure(bg='#2e2e2e')  # Dark background for the root window
-label_bg = '#2e2e2e'  # Background color for labels
-label_fg = '#dcdcdc'  # Light text color for labels
-entry_bg = '#3c3f41'  # Dark background for entry fields
-entry_fg = '#ffffff'  # Light text color for entry fields
-
-# File paths for the data files
-VISITOR_FILE = "visitors.txt"
-EMPLOYEE_FILE = "employees.txt"
-
-# ------------------------------ Validation ________________________________________
+# ---------------------------------- Patterns for validation --------------------------------
 name_pattern = r"^[A-Za-zäöüÄÖÜß\s'-]+$"
 address_pattern = r"^[A-Za-z0-9äöüÄÖÜß,\s'-]+$"
 email_pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
@@ -32,226 +12,272 @@ date_of_birth_pattern = r"^(0?[1-9]|[12][0-9]|3[01])[\/\-](0?[1-9]|1[012])[\/\-]
 id_pattern = r"^\d+$"
 
 
-def validate_name():
-    name = txt_name.get().strip()
-    if not re.match(name_pattern, name):
-        messagebox.showerror("Invalid Name", "Please enter a valid name.")
-        return False
-    return True
+# ------------------------------- Data Clean function --------------------------------
+def clean_data(data):
+    data = data.strip()
+    data = re.sub(r'\s+', ' ', data)
+    return ' '.join(word.capitalize() for word in data.split())
 
 
-def validate_address():
-    address = txt_address.get().strip()
-    if not re.match(address_pattern, address):
-        messagebox.showerror("Invalid Address", "Please enter a valid address.")
-        return False
-    return True
+# method to capitalize every word
+def capitalize_words(data):
+    data = data.strip()
+    data = re.sub(r'\s+', ' ', data)  # Remove extra spaces
+    return ' '.join([word.capitalize() for word in data.split()])
 
 
-def validate_email():
-    email = txt_email.get().strip()
-    if not re.match(email_pattern, email):
-        messagebox.showerror("Invalid Email", "Please enter a valid email address.")
-        return False
-    return True
+# ------------------------------- File Save / Load Functions --------------------------------
+def load_data(filename):
+    data = []
+    if os.path.exists(filename):
+        with open(filename, 'r') as file:
+            data = [line.strip() for line in file.readlines()]
+    return data
 
 
-def validate_telephone():
-    telephone = txt_telephone.get().strip()
-    if not re.match(telephone_pattern, telephone):
-        messagebox.showerror("Invalid Telephone", "Please enter a valid telephone number.")
-        return False
-    return True
+def save_data(filename, data):
+    with open(filename, 'w') as file:
+        for entry in data:
+            file.write(entry + '\n')
 
 
-def validate_date_of_birth():
-    dob = txt_date_of_birth.get().strip()
-    if not re.match(date_of_birth_pattern, dob):
-        messagebox.showerror("Invalid Date of Birth", "Please enter a valid date of birth (DD/MM/YYYY).")
-        return False
-    return True
+# ------------------------ Main Program Functions -----------------------
+
+def get_validated_input(prompt, pattern):
+    while True:
+        value = simpledialog.askstring("Input", prompt)
+        if value is None:  # User cancelled
+            return None
+        if re.match(pattern, value):
+            return value
+        else:
+            messagebox.showerror("Invalid Input", "The input does not match the required format. Please try again.")
 
 
-def validate_employee_id():
-    emp_id = txt_employee_id.get().strip()
-    if not re.match(id_pattern, emp_id):
-        messagebox.showerror("Invalid Employee ID", "Please enter a valid employee ID (numeric).")
-        return False
-    return True
+# ------------------------ Add new Visitor / Employee functions --------------------
+def add_new_visitor():
+    name = get_validated_input("Enter full name:", name_pattern)
+    if not name:
+        return
+    address = get_validated_input("Enter address:", address_pattern)
+    if not address:
+        return
+    email = get_validated_input("Enter email:", email_pattern)
+    if not email:
+        return
+    telephone = get_validated_input("Enter telephone number:", telephone_pattern)
+    if not telephone:
+        return
+    dob = get_validated_input("Enter date of birth (DD/MM/YYYY):", date_of_birth_pattern)
+    if not dob:
+        return
+
+    visitor_data = f"Name: {capitalize_words(name)}, Date of Birth: {dob}, Address: {capitalize_words(address)}, Email: {email}, Telephone: {telephone}, Type: Visitor"
+    visitors.append(visitor_data)
+    save_data('visitors.txt', visitors)
+    messagebox.showinfo("Success", "New visitor added successfully!")
 
 
-def validate():
-    # Validate each field
-    if (validate_name() and validate_address() and validate_email() and
-            validate_telephone() and validate_date_of_birth() and validate_employee_id()):
-        save_data()  # If all fields are valid, save the data
+def add_new_employee():
+    name = get_validated_input("Enter full name:", name_pattern)
+    if not name:
+        return
+    address = get_validated_input("Enter address:", address_pattern)
+    if not address:
+        return
+    email = get_validated_input("Enter email:", email_pattern)
+    if not email:
+        return
+    telephone = get_validated_input("Enter telephone number:", telephone_pattern)
+    if not telephone:
+        return
+    dob = get_validated_input("Enter date of birth (DD/MM/YYYY):", date_of_birth_pattern)
+    if not dob:
+        return
+    employee_id = get_validated_input("Enter Employee ID:", id_pattern)
+    if not employee_id:
+        return
+
+    employee_data = f"Name: {capitalize_words(name)}, Date of Birth: {dob}, Address: {capitalize_words(address)}, Email: {email}, Telephone: {telephone}, Employee ID: {employee_id}, Type: Employee"
+    employees.append(employee_data)
+    save_data('employees.txt', employees)
+    messagebox.showinfo("Success", "New employee added successfully!")
+
+
+# ----------------------------- Show All Functions ------------------------------
+def show_all_visitors():
+    result_text.delete(1.0, tk.END)
+    if not visitors:
+        result_text.insert(tk.END, "No visitors have been added yet.")
     else:
-        messagebox.showerror("Error", "Please correct the errors in the form.")
+        for index, visitor in enumerate(visitors, start=1):
+            result_text.insert(tk.END, f"{index}. {visitor}\n\n")
 
 
-# ----------------------------- Save Data Function --------------------------------
-
-def save_data():
-    name = txt_name.get().strip()
-    address = txt_address.get().strip()
-    email = txt_email.get().strip()
-    telephone = txt_telephone.get().strip()
-    date_of_birth = txt_date_of_birth.get().strip()
-    employee_id = txt_employee_id.get().strip()
-
-    # Create a person dictionary to store the data
-    person_data = {
-        "name": name,
-        "address": address,
-        "email": email,
-        "telephone": telephone,
-        "date_of_birth": date_of_birth,
-        "employee_id": employee_id
-    }
-
-    # Check if the person is an employee or a visitor
-    if employee_id:
-        # Employee: Add to employee list
-        employee_list.append(person_data)
-        save_to_file(EMPLOYEE_FILE, employee_list)  # Save updated data to file
-        messagebox.showinfo("Success", "Employee data saved successfully!")
+def show_all_employees():
+    result_text.delete(1.0, tk.END)
+    if not employees:
+        result_text.insert(tk.END, "No employees have been added yet.")
     else:
-        # Visitor: Add to visitor list
-        visitor_list.append(person_data)
-        save_to_file(VISITOR_FILE, visitor_list)  # Save updated data to file
-        messagebox.showinfo("Success", "Visitor data saved successfully!")
-
-    # Optionally, clear the fields after saving the data
-    clear_fields()
+        for index, employee in enumerate(employees, start=1):
+            result_text.insert(tk.END, f"{index}. {employee}\n\n")
 
 
-# ----------------------------- Clear Fields Function --------------------------------
-def clear_fields():
-    txt_name.delete(0, END)
-    txt_address.delete(0, END)
-    txt_email.delete(0, END)
-    txt_telephone.delete(0, END)
-    txt_date_of_birth.delete(0, END)
-    txt_employee_id.delete(0, END)
+# ----------------------------- Search Function ------------------------------
+def search():
+    choice = simpledialog.askstring("Search", "Enter 1 for Visitors or 2 for Employees:")
+    if choice == '1':
+        search_visitors()
+    elif choice == '2':
+        search_employees()
+    else:
+        messagebox.showerror("Error", "Invalid choice")
 
 
-# ----------------------------- Display All Visitors/Employees --------------------
-def display_all_visitors():
-    display_data(VISITOR_FILE, "Visitors")
+def search_visitors():
+    search_term = simpledialog.askstring("Search Visitors", "Enter search term:")
+    if search_term:
+        results = [v for v in visitors if search_term.lower() in v.lower()]
+        display_search_results(results)
 
 
-def display_all_employees():
-    display_data(EMPLOYEE_FILE, "Employees")
+def search_employees():
+    search_term = simpledialog.askstring("Search Employees", "Enter search term:")
+    if search_term:
+        results = [e for e in employees if search_term.lower() in e.lower()]
+        display_search_results(results)
 
 
-def display_data(file_path, title):
-    # Create a new window to display the data
-    display_window = Toplevel(root)
-    display_window.title(f"All {title}")
-    display_window.geometry("500x300")
-
-    # Add a scrollbar
-    scrollbar = Scrollbar(display_window)
-    scrollbar.pack(side=RIGHT, fill=Y)
-
-    listbox = Listbox(display_window, width=80, height=15, yscrollcommand=scrollbar.set)
-    listbox.pack(padx=10, pady=10)
-    scrollbar.config(command=listbox.yview)
-
-    # Read data from file and add to listbox
-    if os.path.exists(file_path):
-        with open(file_path, "r") as file:
-            lines = file.readlines()
-            for line in lines:
-                listbox.insert(END, line.strip())  # Add each line from file to the listbox
+def display_search_results(results):
+    result_text.delete(1.0, tk.END)
+    if not results:
+        result_text.insert(tk.END, "No matching results found.")
+    else:
+        for index, result in enumerate(results, start=1):
+            result_text.insert(tk.END, f"{index}. {result}\n\n")
 
 
-# ----------------------------- File Handling Functions ---------------------------
-def load_from_file(file_path):
-    # Load data from the file (if it exists)
-    data_list = []
-    if os.path.exists(file_path):
-        with open(file_path, "r") as file:
-            lines = file.readlines()
-            for line in lines:
-                # Split each line by commas and create a dictionary
-                fields = line.strip().split(',')
-                if len(fields) == 6:
-                    person_data = {
-                        "name": fields[0],
-                        "address": fields[1],
-                        "email": fields[2],
-                        "telephone": fields[3],
-                        "date_of_birth": fields[4],
-                        "employee_id": fields[5]
-                    }
-                    data_list.append(person_data)
-    return data_list
+# ----------------------------- Update Functions ------------------------------
+def update():
+    choice = simpledialog.askstring("Update", "Enter 1 for Visitors or 2 for Employees:")
+    if choice == '1':
+        update_visitor()
+    elif choice == '2':
+        update_employee()
+    else:
+        messagebox.showerror("Error", "Invalid choice")
 
 
-def save_to_file(file_path, data):
-    # Save data to the file
-    with open(file_path, "w") as file:
-        for person in data:
-            # Write each person as a comma-separated line
-            file.write(
-                f"{person['name']},{person['address']},{person['email']},{person['telephone']},{person['date_of_birth']},{person['employee_id']}\n")
+def update_visitor():
+    search_term = simpledialog.askstring("Update Visitor", "Enter search term for visitor:")
+    if search_term:
+        matching_visitors = [v for v in visitors if search_term.lower() in v.lower()]
+        if not matching_visitors:
+            messagebox.showinfo("No Results", "No matching visitors found.")
+            return
+
+        result_text.delete(1.0, tk.END)
+        for i, visitor in enumerate(matching_visitors, 1):
+            result_text.insert(tk.END, f"{i}. {visitor}\n\n")
+
+        index = simpledialog.askinteger("Select Visitor", "Enter the number of the visitor to update:", minvalue=1,
+                                        maxvalue=len(matching_visitors))
+        if index is None:
+            return
+
+        visitor = matching_visitors[index - 1]
+        visitor_details = visitor.split(", ")
+
+        field = simpledialog.askstring("Update Field",
+                                       "Enter field to update (Name, Date of Birth, Address, Email, Telephone):")
+        if field:
+            new_value = simpledialog.askstring("New Value", f"Enter new value for {field}:")
+            if new_value:
+                for i, detail in enumerate(visitor_details):
+                    if detail.lower().startswith(field.lower()):
+                        visitor_details[i] = f"{field}: {capitalize_words(new_value)}"
+                        break
+                else:
+                    messagebox.showerror("Error", f"Field '{field}' not found.")
+                    return
+
+        updated_visitor = ", ".join(visitor_details)
+        index_in_main_list = visitors.index(visitor)
+        visitors[index_in_main_list] = updated_visitor
+        save_data('visitors.txt', visitors)
+        messagebox.showinfo("Success", "Visitor updated successfully!")
+        show_all_visitors()
 
 
-# ---------------------------------------------------------------------------------
-# Visitor and Employee Lists
-visitor_list = load_from_file(VISITOR_FILE)  # Load existing visitors from file
-employee_list = load_from_file(EMPLOYEE_FILE)  # Load existing employees from file
+def update_employee():
+    search_term = simpledialog.askstring("Update Employee", "Enter search term for employee:")
+    if search_term:
+        matching_employees = [e for e in employees if search_term.lower() in e.lower()]
+        if not matching_employees:
+            messagebox.showinfo("No Results", "No matching employees found.")
+            return
 
-# ---------------------------- input fields -----------------------------------------
+        result_text.delete(1.0, tk.END)
+        for i, employee in enumerate(matching_employees, 1):
+            result_text.insert(tk.END, f"{i}. {employee}\n\n")
 
-# Adding labels and input fields to the root window
-lbl_title = Label(root, text="Add new person", bg=label_bg, fg=label_fg, font=('Arial', 16, 'bold'))
-lbl_title.grid(column=0, row=0, padx=10, pady=5, sticky='w')
+        index = simpledialog.askinteger("Select Employee", "Enter the number of the employee to update:", minvalue=1,
+                                        maxvalue=len(matching_employees))
+        if index is None:
+            return
 
-lbl_name = Label(root, text="Enter full name: ", bg=label_bg, fg=label_fg)
-lbl_name.grid(column=0, row=1, padx=10, pady=5, sticky='w')
-txt_name = Entry(root, width=30, bg=entry_bg, fg=entry_fg)
-txt_name.grid(column=1, row=1, padx=10, pady=5)
+        employee = matching_employees[index - 1]
+        employee_details = employee.split(", ")
 
-lbl_address = Label(root, text="Enter address: ", bg=label_bg, fg=label_fg)
-lbl_address.grid(column=0, row=2, padx=10, pady=5, sticky='w')
-txt_address = Entry(root, width=30, bg=entry_bg, fg=entry_fg)
-txt_address.grid(column=1, row=2, padx=10, pady=5)
+        field = simpledialog.askstring("Update Field",
+                                       "Enter field to update (Name, Date of Birth, Address, Email, Telephone, Employee ID):")
+        if field:
+            new_value = simpledialog.askstring("New Value", f"Enter new value for {field}:")
+            if new_value:
+                for i, detail in enumerate(employee_details):
+                    if detail.lower().startswith(field.lower()):
+                        employee_details[i] = f"{field}: {capitalize_words(new_value)}"
+                        break
+                else:
+                    messagebox.showerror("Error", f"Field '{field}' not found.")
+                    return
 
-lbl_email = Label(root, text="Enter e-mail address: ", bg=label_bg, fg=label_fg)
-lbl_email.grid(column=0, row=3, padx=10, pady=5, sticky='w')
-txt_email = Entry(root, width=30, bg=entry_bg, fg=entry_fg)
-txt_email.grid(column=1, row=3, padx=10, pady=5)
+        updated_employee = ", ".join(employee_details)
+        index_in_main_list = employees.index(employee)
+        employees[index_in_main_list] = updated_employee
+        save_data('employees.txt', employees)
+        messagebox.showinfo("Success", "Employee updated successfully!")
+        show_all_employees()
 
-lbl_telephone = Label(root, text="Enter telephone number: ", bg=label_bg, fg=label_fg)
-lbl_telephone.grid(column=0, row=4, padx=10, pady=5, sticky='w')
-txt_telephone = Entry(root, width=30, bg=entry_bg, fg=entry_fg)
-txt_telephone.grid(column=1, row=4, padx=10, pady=5)
 
-lbl_date_of_birth = Label(root, text="Enter date of birth (DD/MM/YYYY): ", bg=label_bg, fg=label_fg)
-lbl_date_of_birth.grid(column=0, row=5, padx=10, pady=5, sticky='w')
-txt_date_of_birth = Entry(root, width=30, bg=entry_bg, fg=entry_fg)
-txt_date_of_birth.grid(column=1, row=5, padx=10, pady=5)
+# ----------------------------- Tkinter UI Setup ------------------------------
+def main():
+    global visitors, employees, result_text
 
-lbl_employee_id = Label(root, text="Enter employee ID (if applicable): ", bg=label_bg, fg=label_fg)
-lbl_employee_id.grid(column=0, row=6, padx=10, pady=5, sticky='w')
-txt_employee_id = Entry(root, width=30, bg=entry_bg, fg=entry_fg)
-txt_employee_id.grid(column=1, row=6, padx=10, pady=5)
+    visitors = load_data('visitors.txt')
+    employees = load_data('employees.txt')
 
-# Save button to save data
-btn_save = Button(root, text="Save", command=validate, bg="#4CAF50", fg="white", font=("Arial", 14, "bold"))
-btn_save.grid(column=1, row=7, pady=20)
+    root = tk.Tk()
+    root.title("Personal Data Collection Program")
+    root.geometry("900x600")
 
-# Button to show all visitors
-btn_show_visitors = Button(root, text="Show Visitors", command=display_all_visitors, bg="#4CAF50", fg="white",
-                           font=("Arial", 12))
-btn_show_visitors.grid(column=0, row=8, padx=10, pady=5)
+    main_frame = ttk.Frame(root, padding="10")
+    main_frame.pack(fill=tk.BOTH, expand=True)
 
-# Button to show all employees
-btn_show_employees = Button(root, text="Show Employees", command=display_all_employees, bg="#4CAF50", fg="white",
-                            font=("Arial", 12))
-btn_show_employees.grid(column=1, row=8, padx=10, pady=5)
+    # Create buttons for main menu functions
+    ttk.Button(main_frame, text="Add New Visitor", command=add_new_visitor).pack(fill=tk.X, pady=5)
+    ttk.Button(main_frame, text="Add New Employee", command=add_new_employee).pack(fill=tk.X, pady=5)
+    ttk.Button(main_frame, text="Show All Visitors", command=show_all_visitors).pack(fill=tk.X, pady=5)
+    ttk.Button(main_frame, text="Show All Employees", command=show_all_employees).pack(fill=tk.X, pady=5)
+    ttk.Button(main_frame, text="Search", command=search).pack(fill=tk.X, pady=5)
+    ttk.Button(main_frame, text="Update", command=update).pack(fill=tk.X, pady=5)
+    ttk.Button(main_frame, text="Exit", command=root.quit).pack(fill=tk.X, pady=5)
 
-# Run the main loop
-root.mainloop()
+    # Text widget to show results
+    result_text = tk.Text(main_frame, height=20, width=100, font=("Arial", 10))
+    result_text.pack(pady=10)
+
+    root.mainloop()
+
+
+main()
