@@ -109,7 +109,7 @@ def add_new_person(person_type):
             messagebox.showerror("Error", "Invalid Employee ID!", parent=popup)
             return
 
-        # Create person data string
+        # Person data string
         person_data = f"Name: {capitalize_words(name)}, Date of Birth: {dob}, Address: {capitalize_words(address)}, Email: {email}, Telephone: {telephone}"
         if person_type == "Employee":
             person_data += f", Employee ID: {employee_id}, Type: Employee"
@@ -364,7 +364,6 @@ def delete_employee():
         show_all_employees()
 
 
-
 # ----------------------------- Tkinter UI Setup ------------------------------
 
 def main():
@@ -383,8 +382,7 @@ def main():
     main_frame = ttk.Frame(root, padding="10", style="Dark.TFrame")
     main_frame.pack(fill=tk.BOTH, expand=True)
 
-    # Create buttons for main menu functions
-    # Create a button with black text color
+    # Buttons for main menu functions
     ttk.Button(main_frame, text="Add New Visitor", command=add_new_visitor, style="TButton").pack(fill=tk.X, pady=5)
     ttk.Button(main_frame, text="Add New Employee", command=add_new_employee, style="TButton").pack(fill=tk.X, pady=5)
     ttk.Button(main_frame, text="Show All Visitors", command=show_all_visitors, style="TButton").pack(fill=tk.X, pady=5)
@@ -401,7 +399,6 @@ def main():
 
     # Styling for buttons and other widgets
     style = ttk.Style()
-    # In your style configuration, modify the TButton style:
     style.configure("TButton", background="#555555", foreground="black", font=("Arial", 12), padding=10)
     style.configure("TFrame", background="#333333")
 
