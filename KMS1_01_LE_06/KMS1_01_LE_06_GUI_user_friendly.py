@@ -174,24 +174,24 @@ def show_all_employees():
 # ----------------------------- Search Function ------------------------------
 
 def search():
-    choice = simpledialog.askstring("Search", "Enter 1 for Visitors or 2 for Employees:")
+    choice = simpledialog.askstring("Search", "Enter 1 for Visitors or 2 for Employees:", parent=root)
     if choice == '1':
         search_visitors()
     elif choice == '2':
         search_employees()
     else:
-        messagebox.showerror("Error", "Invalid choice")
+        messagebox.showerror("Error", "Invalid choice", parent=root)
 
 
 def search_visitors():
-    search_term = simpledialog.askstring("Search Visitors", "Enter search term:")
+    search_term = simpledialog.askstring("Search Visitors", "Enter search term:", parent=root)
     if search_term:
         results = [v for v in visitors if search_term.lower() in v.lower()]
         display_search_results(results)
 
 
 def search_employees():
-    search_term = simpledialog.askstring("Search Employees", "Enter search term:")
+    search_term = simpledialog.askstring("Search Employees", "Enter search term:", parent=root)
     if search_term:
         results = [e for e in employees if search_term.lower() in e.lower()]
         display_search_results(results)
@@ -209,7 +209,7 @@ def display_search_results(results):
 # ----------------------------- Update Functions ------------------------------
 
 def update(entry_type, entry_list, filename):
-    search_term = simpledialog.askstring(f"Update {entry_type}", f"Enter search term for {entry_type.lower()}:")
+    search_term = simpledialog.askstring(f"Update {entry_type}", f"Enter search term for {entry_type.lower()}:", parent=root)
     if search_term:
         matching_entries = [e for e in entry_list if search_term.lower() in e.lower()]
         if not matching_entries:
@@ -223,7 +223,7 @@ def update(entry_type, entry_list, filename):
 
         index = simpledialog.askinteger(f"Select {entry_type}",
                                         f"Enter the number of the {entry_type.lower()} to update:", minvalue=1,
-                                        maxvalue=len(matching_entries))
+                                        maxvalue=len(matching_entries), parent=root)
         if index is None:
             return
 
@@ -282,7 +282,7 @@ def update_employee():
 # ----------------------------- Delete Function ------------------------------
 
 def delete():
-    choice = simpledialog.askstring("Delete", "Enter 1 for Visitors or 2 for Employees:")
+    choice = simpledialog.askstring("Delete", "Enter 1 for Visitors or 2 for Employees:", parent=root)
     if choice == '1':
         delete_visitor()
     elif choice == '2':
@@ -292,7 +292,7 @@ def delete():
 
 
 def delete_visitor():
-    search_term = simpledialog.askstring("Delete Visitor", "Enter search term for visitor:")
+    search_term = simpledialog.askstring("Delete Visitor", "Enter search term for visitor:", parent=root)
     if search_term:
         matching_visitors = [v for v in visitors if search_term.lower() in v.lower()]
         if not matching_visitors:
@@ -304,7 +304,7 @@ def delete_visitor():
             result_text.insert(tk.END, f"{i}. {visitor}\n\n")
 
         index = simpledialog.askinteger("Select Visitor", "Enter the number of the visitor to delete:", minvalue=1,
-                                        maxvalue=len(matching_visitors))
+                                        maxvalue=len(matching_visitors), parent=root)
         if index is None:
             return
 
@@ -317,7 +317,7 @@ def delete_visitor():
 
 
 def delete_employee():
-    search_term = simpledialog.askstring("Delete Employee", "Enter search term for employee:")
+    search_term = simpledialog.askstring("Delete Employee", "Enter search term for employee:", parent=root)
     if search_term:
         matching_employees = [e for e in employees if search_term.lower() in e.lower()]
         if not matching_employees:
@@ -328,8 +328,7 @@ def delete_employee():
         for i, employee in enumerate(matching_employees, 1):
             result_text.insert(tk.END, f"{i}. {employee}\n\n")
 
-        index = simpledialog.askinteger("Select Employee", "Enter the number of the employee to delete:", minvalue=1,
-                                        maxvalue=len(matching_employees))
+        index = simpledialog.askinteger("Select Employee", "Enter the number of the employee to delete:", minvalue=1, maxvalue=len(matching_employees), parent=root)
         if index is None:
             return
 
@@ -344,7 +343,7 @@ def delete_employee():
 # ----------------------------- Tkinter UI Setup ------------------------------
 
 def main():
-    global visitors, employees, result_text
+    global visitors, employees, result_text, root
 
     visitors = load_data('visitors.txt')
     employees = load_data('employees.txt')
