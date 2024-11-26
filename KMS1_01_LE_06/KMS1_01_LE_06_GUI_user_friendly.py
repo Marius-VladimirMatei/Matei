@@ -374,7 +374,7 @@ def main():
 
     root = tk.Tk()
     root.title("Personal Data Collection Program")
-    root.geometry("900x600")
+    root.geometry("800x700")
 
     # Dark theme colors
     root.config(bg="#333333")
@@ -382,29 +382,86 @@ def main():
     main_frame = ttk.Frame(root, padding="10", style="Dark.TFrame")
     main_frame.pack(fill=tk.BOTH, expand=True)
 
-    # Buttons for main menu functions
-    ttk.Button(main_frame, text="Add New Visitor", command=add_new_visitor, style="TButton").pack(fill=tk.X, pady=5)
-    ttk.Button(main_frame, text="Add New Employee", command=add_new_employee, style="TButton").pack(fill=tk.X, pady=5)
-    ttk.Button(main_frame, text="Show All Visitors", command=show_all_visitors, style="TButton").pack(fill=tk.X, pady=5)
-    ttk.Button(main_frame, text="Show All Employees", command=show_all_employees, style="TButton").pack(fill=tk.X,                                                                                                   pady=5)
-    ttk.Button(main_frame, text="Search", command=search, style="TButton").pack(fill=tk.X, pady=5)
-    ttk.Button(main_frame, text="Update", command=update).pack(fill=tk.X, pady=5)
-    ttk.Button(main_frame, text="Delete", command=delete, style="TButton").pack(fill=tk.X, pady=5)
-    ttk.Button(main_frame, text="Exit", command=root.quit, style="TButton").pack(fill=tk.X, pady=5)
+
+
+    # ------------------------ Dropdown button for ADD NEW Visitor or Employee ------------------------
+    dropdown_button = ttk.Menubutton(main_frame, text="Add New", style="TButton")
+    #dropdown_button.pack(fill=tk.X, pady=5)
+    dropdown_button.pack(anchor="center", pady=5)
+
+
+    # Create a menu for the dropdown button
+    add_menu = tk.Menu(dropdown_button, tearoff=0)
+    add_menu.add_command(label="Add New Visitor", command=add_new_visitor)
+    add_menu.add_command(label="Add New Employee", command=add_new_employee)
+
+    # Attach the menu to the dropdown button
+    dropdown_button["menu"] = add_menu
+
+
+    #------------------------- Dropdown button for SHOW ALL Visitors or Employees ------------------------
+    dropdown_button = ttk.Menubutton(main_frame, text="Show All", style="TButton")
+    dropdown_button.pack(anchor="center", pady=5)
+
+    # Create a menu for the dropdown button
+    add_menu = tk.Menu(dropdown_button, tearoff=0)
+    add_menu.add_command(label="Show all Visitors", command=show_all_visitors)
+    add_menu.add_command(label="Show all Employees", command=show_all_employees)
+
+    # Attach the menu to the dropdown button
+    dropdown_button["menu"] = add_menu
+
+
+    # ------------------------- Dropdown button for SEARCH Visitors or Employees ------------------------
+    dropdown_button = ttk.Menubutton(main_frame, text="Search", style="TButton")
+    dropdown_button.pack(anchor="center", pady=5)
+
+    # Create a menu for the dropdown button
+    add_menu = tk.Menu(dropdown_button, tearoff=0)
+    add_menu.add_command(label="Search Visitor", command=search_visitors)
+    add_menu.add_command(label="Search Employee", command=search_employees)
+
+    # Attach the menu to the dropdown button
+    dropdown_button["menu"] = add_menu
+
+    # ------------------------- Dropdown button for UPDATE Visitors or Employees ------------------------
+    dropdown_button = ttk.Menubutton(main_frame, text="Update", style="TButton")
+    dropdown_button.pack(anchor="center", pady=5)
+
+    # Create a menu for the dropdown button
+    add_menu = tk.Menu(dropdown_button, tearoff=0)
+    add_menu.add_command(label="Update Visitor", command=update_visitor)
+    add_menu.add_command(label="Update Employee", command=update_employee)
+
+    # Attach the menu to the dropdown button
+    dropdown_button["menu"] = add_menu
+
+    # ------------------------- Dropdown button for DELETE Visitors or Employees ------------------------
+    dropdown_button = ttk.Menubutton(main_frame, text="Delete", style="TButton")
+    dropdown_button.pack(anchor="center", pady=5)
+
+    # Create a menu for the dropdown button
+    add_menu = tk.Menu(dropdown_button, tearoff=0)
+    add_menu.add_command(label="Delete Visitor", command=delete_visitor)
+    add_menu.add_command(label="Delete Employee", command=delete_employee)
+
+    # Attach the menu to the dropdown button
+    dropdown_button["menu"] = add_menu
+
+    # ------------------------- Buttons for other main menu functions -------------------------------------
+
+    ttk.Button(main_frame, text="Exit", command=root.quit, style="TButton").pack(anchor="center", pady=5)
 
     # Text widget to show results
     result_text = tk.Text(main_frame, height=20, width=100, font=("Arial", 10))
     result_text.pack(pady=10)
-
 
     # Styling for buttons and other widgets
     style = ttk.Style()
     style.configure("TButton", background="#555555", foreground="black", font=("Arial", 12), padding=10)
     style.configure("TFrame", background="#333333")
 
-
     root.mainloop()
-
 
 main()
 
