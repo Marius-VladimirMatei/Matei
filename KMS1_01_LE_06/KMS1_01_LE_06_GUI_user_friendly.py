@@ -28,7 +28,7 @@ def capitalize_words(data):
     data = re.sub(r'\s+', ' ', data)  # Remove extra spaces
     return ' '.join([word.capitalize() for word in data.split()])
 
-
+"""
 def get_validated_input(prompt, pattern):
     while True:
         value = simpledialog.askstring("Input", prompt)
@@ -38,7 +38,7 @@ def get_validated_input(prompt, pattern):
             return value
         else:
             messagebox.showerror("Invalid Input", "The input does not match the required format. Please try again.")
-
+"""
 
 # ------------------------------- File Load / Save in file Functions --------------------------------
 
@@ -62,15 +62,15 @@ def add_new_person(person_type):
     # Create the Toplevel popup window
     popup = tk.Toplevel()
     popup.title(f"Add New {person_type}")
-    popup.geometry("400x300")
+    popup.geometry("400x350")
     popup.config(bg="#333333")  # Dark theme background for the popup
 
+
     # Configure style for TButton and TFrame
-    style = ttk.Style()
-    style.configure("TButton", background="#555555", foreground="black", font=("Arial", 12), padding=10)
-    style.configure("TLabel", background="#333333", foreground="white", font=("Arial", 10))  # Style for labels
-    style.configure("TEntry", padding=5)  # Ensure entries are styled
-    style.configure("TFrame", background="#333333")  # Frame style for dark theme
+    #style = ttk.Style()
+    #style.configure("TButton", background="#555555", foreground="black", font=("Arial", 12,), padding=10)
+    #style.configure("TLabel", background="#333333", foreground="white", font=("Arial", 10))  # Style for labels
+
 
     # Variables to hold input data
     name_var = tk.StringVar()
@@ -145,7 +145,6 @@ def add_new_person(person_type):
 
     ttk.Button(frame, text="Save", command=save_person).grid(row=6, column=1, pady=15)
 
-
 def add_new_visitor():
     add_new_person("Visitor")
 
@@ -209,96 +208,74 @@ def display_search_results(results):
 
 # ----------------------------- Update Functions ------------------------------
 
-def update():
-    choice = simpledialog.askstring("Update", "Enter 1 for Visitors or 2 for Employees:")
-    if choice == '1':
-        update_visitor()
-    elif choice == '2':
-        update_employee()
-    else:
-        messagebox.showerror("Error", "Invalid choice")
+def update(entry_type, entry_list, filename):
+    search_term = simpledialog.askstring(f"Update {entry_type}", f"Enter search term for {entry_type.lower()}:")
+    if search_term:
+        matching_entries = [e for e in entry_list if search_term.lower() in e.lower()]
+        if not matching_entries:
+            messagebox.showinfo("No Results", f"No matching {entry_type.lower()}s found.")
+            return
+
+        # Display results and select entry to update
+        result_text.delete(1.0, tk.END)
+        for i, entry in enumerate(matching_entries, 1):
+            result_text.insert(tk.END, f"{i}. {entry}\n\n")
+
+        index = simpledialog.askinteger(f"Select {entry_type}",
+                                        f"Enter the number of the {entry_type.lower()} to update:", minvalue=1,
+                                        maxvalue=len(matching_entries))
+        if index is None:
+            return
+
+        # Get selected entry details
+        selected_entry = matching_entries[index - 1]
+        entry_details = selected_entry.split(", ")
+
+        # Create a popup window for updating
+        popup = tk.Toplevel()
+        popup.title(f"Update {entry_type}")
+        popup.geometry("400x400")
+        popup.config(bg="#333333")  # Dark theme background for the popup
+
+
+        # Variables to hold updated data
+        fields = {}
+
+        # Create input fields for each detail
+        row_index = 0
+        for i, detail in enumerate(entry_details):
+            field_name, current_value = detail.split(": ")
+            if field_name == "Type":
+                ttk.Label(popup, text=f"{field_name}: {current_value}").grid(row=row_index, column=0, columnspan=2, padx=10, pady=5)
+
+            else:
+                fields[field_name] = tk.StringVar(value=current_value)
+
+                ttk.Label(popup, text=f"{field_name}:").grid(row=i, column=0, padx=10, pady=5, sticky="e")
+                ttk.Entry(popup, textvariable=fields[field_name], width=30).grid(row=i, column=1, padx=10, pady=5)
+                row_index += 1
+
+        def save_updated_entry():
+            updated_details = [f"{field}: {capitalize_words(var.get())}" for field, var in fields.items()]
+            updated_entry = ", ".join(updated_details)
+
+            index_in_main_list = entry_list.index(selected_entry)
+            entry_list[index_in_main_list] = updated_entry
+            save_data(filename, entry_list)
+
+            messagebox.showinfo("Success", f"{entry_type} updated successfully!")
+            popup.destroy()
+            #show_all_entries(entry_type)
+
+        ttk.Button(popup, text="Save", command=save_updated_entry).grid(row=len(entry_details), column=1, pady=15)
 
 
 def update_visitor():
-    search_term = simpledialog.askstring("Update Visitor", "Enter search term for visitor:")
-    if search_term:
-        matching_visitors = [v for v in visitors if search_term.lower() in v.lower()]
-        if not matching_visitors:
-            messagebox.showinfo("No Results", "No matching visitors found.")
-            return
-
-        result_text.delete(1.0, tk.END)
-        for i, visitor in enumerate(matching_visitors, 1):
-            result_text.insert(tk.END, f"{i}. {visitor}\n\n")
-
-        index = simpledialog.askinteger("Select Visitor", "Enter the number of the visitor to update:", minvalue=1,
-                                        maxvalue=len(matching_visitors))
-        if index is None:
-            return
-
-        visitor = matching_visitors[index - 1]
-        visitor_details = visitor.split(", ")
-
-        field = simpledialog.askstring("Update Field",
-                                       "Enter field to update (Name, Date of Birth, Address, Email, Telephone):")
-        if field:
-            new_value = simpledialog.askstring("New Value", f"Enter new value for {field}:")
-            if new_value:
-                for i, detail in enumerate(visitor_details):
-                    if detail.lower().startswith(field.lower()):
-                        visitor_details[i] = f"{field}: {capitalize_words(new_value)}"
-                        break
-                else:
-                    messagebox.showerror("Error", f"Field '{field}' not found.")
-                    return
-
-        updated_visitor = ", ".join(visitor_details)
-        index_in_main_list = visitors.index(visitor)
-        visitors[index_in_main_list] = updated_visitor
-        save_data('visitors.txt', visitors)
-        messagebox.showinfo("Success", "Visitor updated successfully!")
-        show_all_visitors()
+    update("Visitor", visitors, 'visitors.txt')
 
 
 def update_employee():
-    search_term = simpledialog.askstring("Update Employee", "Enter search term for employee:")
-    if search_term:
-        matching_employees = [e for e in employees if search_term.lower() in e.lower()]
-        if not matching_employees:
-            messagebox.showinfo("No Results", "No matching employees found.")
-            return
-
-        result_text.delete(1.0, tk.END)
-        for i, employee in enumerate(matching_employees, 1):
-            result_text.insert(tk.END, f"{i}. {employee}\n\n")
-
-        index = simpledialog.askinteger("Select Employee", "Enter the number of the employee to update:", minvalue=1,
-                                        maxvalue=len(matching_employees))
-        if index is None:
-            return
-
-        employee = matching_employees[index - 1]
-        employee_details = employee.split(", ")
-
-        field = simpledialog.askstring("Update Field",
-                                       "Enter field to update (Name, Date of Birth, Address, Email, Telephone, Employee ID):")
-        if field:
-            new_value = simpledialog.askstring("New Value", f"Enter new value for {field}:")
-            if new_value:
-                for i, detail in enumerate(employee_details):
-                    if detail.lower().startswith(field.lower()):
-                        employee_details[i] = f"{field}: {capitalize_words(new_value)}"
-                        break
-                else:
-                    messagebox.showerror("Error", f"Field '{field}' not found.")
-                    return
-
-        updated_employee = ", ".join(employee_details)
-        index_in_main_list = employees.index(employee)
-        employees[index_in_main_list] = updated_employee
-        save_data('employees.txt', employees)
-        messagebox.showinfo("Success", "Employee updated successfully!")
-        show_all_employees()
+    update("Employee", employees, 'employees.txt')
 
 
 
@@ -460,6 +437,8 @@ def main():
     style = ttk.Style()
     style.configure("TButton", background="#555555", foreground="black", font=("Arial", 12), padding=10)
     style.configure("TFrame", background="#333333")
+    style.configure("TLabel", background="#333333", foreground="white", font=("Arial", 10))  # Style for labels
+    style.configure("TEntry", padding=5)  # Ensure entries are styled
 
     root.mainloop()
 
